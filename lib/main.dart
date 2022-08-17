@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hcs_mobile/Screen/CartScreen.dart';
 import 'package:hcs_mobile/Screen/CompleteRegisterScreen.dart';
 import 'package:hcs_mobile/Screen/DetailProdukScreen.dart';
 import 'package:hcs_mobile/Screen/home/HomeScreen.dart';
@@ -16,6 +17,7 @@ import 'package:hcs_mobile/Screen/home/MainScreen.dart';
 import 'package:hcs_mobile/cubit/auth_cubit_cubit.dart';
 import 'package:hcs_mobile/cubit/change_page_cubit_cubit.dart';
 import 'package:hcs_mobile/cubit/covid_cubit_cubit.dart';
+import 'package:hcs_mobile/cubit/keranjang_cubit_cubit.dart';
 import 'package:hcs_mobile/cubit/produk_cubit_cubit.dart';
 import 'package:hcs_mobile/cubit/register_cubit_cubit.dart';
 
@@ -27,6 +29,7 @@ import 'package:hcs_mobile/cubit/register_cubit_cubit.dart';
   }
 }
 void main() {
+
   HttpOverrides.global = MyHttpOverrides();
   runApp(const MyApp());
 }
@@ -61,6 +64,9 @@ class MyApp extends StatelessWidget {
         ),BlocProvider(
           create: (context) => ChangePageCubit(),
           
+        ),BlocProvider(
+          create: (context) => KeranjangCubitCubit(),
+          
         ),
       ],
       child: MaterialApp(
@@ -75,6 +81,7 @@ class MyApp extends StatelessWidget {
           // '/': (context) => LoginScreen(),
           '/': (context) => MainScreen(),
           '/verification': (context) => const VerificationScreen(),
+          '/cart': (context) => const CartScreen(),
           '/register': (context) => RegisterScreen(),
           '/login': (context) => LoginScreen()
           },

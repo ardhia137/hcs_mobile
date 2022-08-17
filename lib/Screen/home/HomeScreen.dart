@@ -44,9 +44,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     _transTween = Tween(begin: Offset(-10, 40), end: Offset(-10, 0))
         .animate(_TextAnimationController);
-
     super.initState();
+    // print('objectdassds');
   }
+
+
+
 
   bool _scrollListener(ScrollNotification scrollInfo) {
     if (scrollInfo.metrics.axis == Axis.vertical) {
@@ -57,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
     return false;
   }
-
+final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     final double shortestside = MediaQuery.of(context).size.shortestSide;
@@ -186,6 +189,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   Icons.local_grocery_store_outlined,
                 ),
                 onPressed: () {
+                  Navigator.pushNamed(context, '/cart');
 //                          Navigator.of(context).push(TutorialOverlay());
                 },
               ),
@@ -381,6 +385,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             return InkWell(
               onTap: (){
                 Navigator.push(context, MaterialPageRoute(builder: ((context) => DetailProdukScreen(
+                  id: produk[index].id,
+                  id_kategori: produk[index].id_kategori,
                   img: produk[index].gambar,
                   judul: produk[index].nama,
                   harga: produk[index].harga,
@@ -400,15 +406,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
 
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: whiteColor,
       body: NotificationListener<ScrollNotification>(
           onNotification: _scrollListener,
-          child: BlocBuilder<CovidCubitCubit, CovidCubitState>(
+          child: BlocBuilder<CovidCubitCubit, CovidCubitState>(         
             builder: (context, covidstate) {
-                        // print(covidstate);
               return BlocBuilder<ProdukCubitCubit, ProdukCubitState>(
+                bloc: BlocProvider.of<ProdukCubitCubit>(context)..get_produk(11),
                 builder: (context, produkstate) {
-                        // print(produkstate);
                   if (covidstate is CovidCubitSuccess &&
                       produkstate is ProdukCubitSuccess) {
                     var data_covid = covidstate.covid;

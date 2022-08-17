@@ -7,7 +7,8 @@ class ButtonWidget extends StatelessWidget {
   final Border border;
   final String text;
   final Function() onpressed;
-  const ButtonWidget({Key? key,required this.color,this.border = const Border(),required this.textStyle,required this.text,required this.onpressed}) : super(key: key);
+  final EdgeInsets padding;
+  const ButtonWidget({Key? key,required this.color,this.border = const Border(),required this.textStyle,required this.text,required this.onpressed, this.padding = const EdgeInsets.symmetric(vertical: 5) }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +17,7 @@ class ButtonWidget extends StatelessWidget {
     return InkWell(
       onTap: onpressed,
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 5),
+        padding: padding,
         height: phonelayout == true ? 40 : 50,
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10), color: color,border: border),

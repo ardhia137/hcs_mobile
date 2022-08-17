@@ -30,4 +30,5 @@ class Getpassword extends Cubit<bool> {
   void getpassword(bool value) {
     emit(value);
   }
+  
 }

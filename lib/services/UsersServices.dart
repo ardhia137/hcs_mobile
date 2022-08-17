@@ -30,7 +30,7 @@ class UsersServices {
       UserModel user = UserModel.fromJson(data['data']);
       return user;
     } else {
-      throw Exception('Gagal Login');
+      throw Exception('Gagal login');
     }
   }
 
@@ -57,7 +57,7 @@ class UsersServices {
       return true;
     } else {
       // return false;
-      throw Exception(data['message']);
+      throw Exception('Gagal register');
     }
   }
 
@@ -85,7 +85,7 @@ class UsersServices {
       UserModel user = UserModel.fromJson(data['data']);
       return user;
     } else {
-      throw Exception('Gagal Login');
+      throw Exception('Gagal register');
     }
   } 
 Future<bool> complete_auth({
@@ -113,7 +113,36 @@ Future<bool> complete_auth({
     if (response.statusCode == 200) {
       return true;
     } else {
-      throw Exception('Gagal Login');
+      throw Exception('Gagal register');
+    }
+  }
+
+  Future<bool> keranjang({
+    String? email,
+    int? id_produk,
+    int? jumlah,
+  }) async {
+    var url = '${baseurl()}/api/keranjang';
+    var headers = {'Content-Type': 'application/json; charset=utf-8'};
+    var body = jsonEncode({
+      'email': email,
+      'id_produk': id_produk,
+      'jumlah': jumlah,
+    });
+
+    var response = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: body,
+    );
+    print(url);
+    print(response.statusCode);
+    // print(response.body);
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception('Gagal memasukan keranjang');
     }
   }
 }

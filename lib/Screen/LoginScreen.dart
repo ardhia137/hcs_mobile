@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hcs_mobile/Widget/ButtonWidget.dart';
 import 'package:hcs_mobile/Widget/TextFieldWidget.dart';
 import 'package:hcs_mobile/cubit/auth_cubit_cubit.dart';
+import 'package:hcs_mobile/cubit/change_page_cubit_cubit.dart';
 import 'package:hcs_mobile/utils/theme.dart';
 import 'package:hcs_mobile/utils/validation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,9 +38,10 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void setState(VoidCallback fn) {
     // TODO: implement setState
-    super.setState(fn);
     context.read<AuthCubitCubit>().clear();
+    super.setState(fn);
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -376,14 +378,21 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     }
 
-    return Scaffold(
-      backgroundColor: whiteColor,
-      body: Container(
-        margin: EdgeInsets.symmetric(vertical: 25, horizontal: 15),
-        child: Form(
-          key: formKey,
-          child: ListView(
-            children: [header(), textFieldAndButton(), button(), daftar()],
+    return WillPopScope(
+       onWillPop: () {
+              context.read<ChangePageCubit>().setPage(0);
+              Navigator.pop(context, false);
+              return Future.value(false);
+            },
+      child: Scaffold(
+        backgroundColor: whiteColor,
+        body: Container(
+          margin: EdgeInsets.symmetric(vertical: 25, horizontal: 15),
+          child: Form(
+            key: formKey,
+            child: ListView(
+              children: [header(), textFieldAndButton(), button(), daftar()],
+            ),
           ),
         ),
       ),
