@@ -521,7 +521,8 @@ class _DetailProdukScreenState extends State<DetailProdukScreen> {
                               ),
                               text: "+ Keranjang",
                               onpressed: () {
-                                context.read<KeranjangCubitCubit>().keranjang(
+                                print(widget.id);
+                                context.read<KeranjangCubitCubit>().add_keranjang(
                                     email: email!,
                                     id_produk: widget.id,
                                     jumlah: 1);
@@ -606,6 +607,9 @@ class _DetailProdukScreenState extends State<DetailProdukScreen> {
         ),
       );
     }
+
+
+
 
     return BlocBuilder<ProdukCubitCubit, ProdukCubitState>(    
       bloc: BlocProvider.of<ProdukCubitCubit>(context)

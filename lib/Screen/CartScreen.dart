@@ -3,23 +3,51 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hcs_mobile/Widget/ButtonWidget.dart';
 import 'package:hcs_mobile/cubit/counter_cubit_cubit.dart';
+import 'package:hcs_mobile/cubit/keranjang_cubit_cubit.dart';
+import 'package:hcs_mobile/cubit/produk_cubit_cubit.dart';
+import 'package:hcs_mobile/cubit/select_produk_cubit_cubit.dart';
+import 'package:hcs_mobile/model/KeranjangModel.dart';
 
 import 'package:hcs_mobile/utils/theme.dart';
+import 'package:hcs_mobile/utils/url.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CartScreen extends StatefulWidget {
-  const CartScreen({Key? key}) : super(key: key);
+  CartScreen({Key? key}) : super(key: key);
 
   @override
   State<CartScreen> createState() => _CartScreenState();
 }
 
 class _CartScreenState extends State<CartScreen> {
-  bool isChecked = false;
-  TextEditingController input = TextEditingController(text: '1');
-  String? number = "";
+  // bool isChecked = false;
+  // bool produkIsChecked = false;
+  int? total = 0;
+  // String? number = "";
+  String? email;
+
+  cek() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      email = (prefs.getString('email'));
+    });
+    return email = (prefs.getString('email'));
+  }
+
+  @override
+  void initState() {
+    context.read<TotalProductCubit>().checked(0);
+    KeranjangCubitCubit keranjang = KeranjangCubitCubit();
+    super.initState();
+    cek().then((value) =>
+        context.read<KeranjangCubitCubit>().get_keranjang(email: email!));
+    // keranjang.get_keranjang(email: email!));
+  }
+
   @override
   Widget build(BuildContext context) {
-
+    var numberFormat = new NumberFormat("#,##0", "en_US");
     Widget appbar() {
       return AppBar(
         bottom: PreferredSize(
@@ -31,12 +59,13 @@ class _CartScreenState extends State<CartScreen> {
                     checkColor: Colors.white,
                     fillColor:
                         MaterialStateProperty.resolveWith<Color>((states) {
-                      return isChecked == true ? primaryColor : secondaryColor;
+                      return secondaryColor;
+                      // return isChecked == true ? primaryColor : secondaryColor;
                     }),
-                    value: isChecked,
+                    value: false,
                     onChanged: (bool? value) {
                       setState(() {
-                        isChecked = value!;
+                        // isChecked = value!;
                       });
                     },
                   ),
@@ -127,9 +156,16 @@ class _CartScreenState extends State<CartScreen> {
       );
     }
 
-    Widget produk() {
+    Widget produk(int id, String nama, String gambar, int jumlah, int harga) {
+      TextEditingController input =
+          TextEditingController(text: jumlah.toString());
       CounterCubitCubit counter =
           CounterCubitCubit(init: int.parse(input.text));
+      SelectProductCubit selectProduk = SelectProductCubit();
+      // TotalProductCubit totalProduk = TotalProductCubit();
+      KeranjangCubitCubit keranjang = KeranjangCubitCubit();
+      bool? isSelect;
+
       return Column(
         children: [
           pembatas(7),
@@ -137,20 +173,41 @@ class _CartScreenState extends State<CartScreen> {
             padding: EdgeInsets.symmetric(vertical: 15),
             child: Row(
               children: [
-                Checkbox(
-                  checkColor: Colors.white,
-                  fillColor: MaterialStateProperty.resolveWith<Color>((states) {
-                    return isChecked == true ? primaryColor: secondaryColor;
-                  }),
-                  value: isChecked,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      isChecked = value!;
-                    });
+                BlocBuilder<SelectProductCubit, bool>(
+                  bloc: selectProduk,
+                  builder: (context, state) {
+                    print(state);
+                    return Checkbox(
+                      checkColor: Colors.white,
+                      fillColor:
+                          MaterialStateProperty.resolveWith<Color>((states) {
+                        // return primaryColor;
+                        return state == true ? primaryColor : secondaryColor;
+                      }),
+                      value: state,
+                      onChanged: (bool? value) {
+                        selectProduk.checked();
+                        if (value == true) {
+                          total = (harga * int.parse(input.text)) + total!;
+                        } else {
+                          total = total! - (harga * int.parse(input.text));
+                        }
+                        isSelect = value;
+                        context.read<TotalProductCubit>().checked(total);
+                        // print(total);
+                        // totalProduk.checked(total);
+                        //  totalProduk.emit(total!);
+                        // print(total);
+                        // setState(() {
+                        //   print(value!);
+                        //   // isChecked = value!;
+                        // });
+                      },
+                    );
                   },
                 ),
-                Image.asset(
-                  'assets/porduk.jpeg',
+                Image.network(
+                  '${baseurl()}/img/${gambar}',
                   width: 80,
                 ),
                 SizedBox(
@@ -162,13 +219,13 @@ class _CartScreenState extends State<CartScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'VITACIMIN TABLET (per Strip)',
+                        '${nama}',
                         style: secondaryTextstyle,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        'Rp. 2.012',
+                        'Rp. ${numberFormat.format(harga)}',
                         style: secondaryTextstyle.copyWith(
                           fontWeight: semibold,
                           fontSize: 16,
@@ -179,9 +236,33 @@ class _CartScreenState extends State<CartScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Icon(Icons.delete_outline,size: 25,color: secondaryColor,),
-                          SizedBox(width: 5,),
-                           Container(
+                          InkWell(
+                            onTap: () {
+                              // total = 0;
+
+                              //   context
+                              // .read<KeranjangCubitCubit>()
+                              // .delete_keranjang(id_keranjang: id);
+                              // Future.delayed(const Duration(seconds: 1), () async {
+                              keranjang.delete_keranjang(id_keranjang: id);
+                              // keranjang.get_keranjang(email: email!);
+                              // Navigator.pushReplacementNamed(context, '/cart');
+                              // Navigator.popAndPushNamed(context, '/cart');
+                              // });
+                              context
+                                  .read<KeranjangCubitCubit>()
+                                  .get_keranjang(email: email!);
+                            },
+                            child: Icon(
+                              Icons.delete_outline,
+                              size: 25,
+                              color: secondaryColor,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Container(
                             margin: EdgeInsets.only(right: 15),
                             width: 70,
                             height: 25,
@@ -194,7 +275,20 @@ class _CartScreenState extends State<CartScreen> {
                               children: [
                                 InkWell(
                                   onTap: () {
-                                    counter.decrement();
+                                    if (int.parse(input.text) > 1) {
+                                      if (isSelect == true) {
+                                        print('sebelum di kurang ${total}');
+                                        total = total! - harga;
+                                        print('setelh di kurang ${total}');
+                                      }
+                                      context
+                                          .read<TotalProductCubit>()
+                                          .checked(total);
+                                      // print('object');
+                                    }
+                                    counter.decrement(id_keranjang: id);
+                                    // print(input.text);
+                                    // context.read<KeranjangCubitCubit>().update_keranjang(id_keranjang: id,jumlah: int.parse(input.text));
                                   },
                                   child: Icon(
                                     Icons.remove,
@@ -204,24 +298,32 @@ class _CartScreenState extends State<CartScreen> {
                                 ),
                                 BlocBuilder<CounterCubitCubit, int>(
                                   bloc: counter,
-                                  buildWhen: (previous,current){
-                                    if(current < 1){
+                                  buildWhen: (previous, current) {
+                                    if (current < 1) {
                                       counter.emit(1);
                                       return false;
-                                    }else if(current >100){
+                                    } else if (current > 100) {
                                       counter.emit(100);
                                       return false;
                                     }
                                     return true;
                                   },
                                   builder: (context, state) {
-                                    Future.delayed(Duration.zero, () async {
-                                      var newText = state.toString();
-                                      input.value = input.value.copyWith(
-                                          text: newText,
-                                          selection: TextSelection.collapsed(
-                                              offset: newText.length));
-                                    });
+                                    // Future.delayed(Duration.zero, () async {});
+                                    var newText = state.toString();
+                                    input.value = input.value.copyWith(
+                                        text: newText,
+                                        selection: TextSelection.collapsed(
+                                            offset: newText.length));
+
+                                    //hitung total
+                                    // if (isSelect == true) {
+                                    //   total = total! + (harga * state);
+                                    //   print(total);
+                                    //   context
+                                    //       .read<TotalProductCubit>()
+                                    //       .checked(total);
+                                    // }
                                     print(state);
                                     return Container(
                                       margin: EdgeInsets.only(top: 3),
@@ -229,13 +331,37 @@ class _CartScreenState extends State<CartScreen> {
                                       height: 18,
                                       child: TextFormField(
                                         onChanged: (text) {
-                                          number = text;
-                                          print(number);
+                                          // int number = int.parse(text);
+                                          // print(state);
+                                          String? newText;
+                                          int? ntotal;
                                           if (text != "") {
                                             counter.emit(int.parse(text));
+                                            counter.update(id_keranjang: id);
+                                            if (isSelect == true) {
+                                              total = total! - harga * state;
+                                              print(
+                                                  'sebelum di kurang ${total}');
+                                              ntotal =
+                                                  (harga * int.parse(text));
+                                              print(
+                                                  'setelh di kurang ${ntotal}');
+                                                    total = total! + ntotal;
+                                              // if (state > int.parse(text)) {
+                                              //   // total =
+                                              //   //     total! - harga;
+                                              // print(total);
+                                              // } else {
+                                              // print('total anjing ${ntotal}');
+                                              //   total =
+                                              //       total! + ntotal;
+                                              // }
+                                              context
+                                                  .read<TotalProductCubit>()
+                                                  .checked(total);
+                                            }
                                             if (int.parse(text) > 100) {
-                                              print('g');
-                                              const newText = '100';
+                                              newText = '100';
                                               input.value = input.value
                                                   .copyWith(
                                                       text: newText,
@@ -243,9 +369,26 @@ class _CartScreenState extends State<CartScreen> {
                                                           .collapsed(
                                                               offset: newText
                                                                   .length));
-                                              print(text);
+                                              // print(text);
+
                                             }
+                                            //
+                                          } else {
+                                            newText = state.toString();
+                                            input.value = input.value.copyWith(
+                                                text: newText,
+                                                selection:
+                                                    TextSelection.collapsed(
+                                                        offset:
+                                                            newText.length));
                                           }
+                                          // if (isSelect == true) {
+                                          //   total = total! + (harga * int.parse(text));
+                                          //   print(total);
+                                          //   context
+                                          //       .read<TotalProductCubit>()
+                                          //       .checked(total);
+                                          // }
                                         },
                                         inputFormatters: <TextInputFormatter>[
                                           FilteringTextInputFormatter.digitsOnly
@@ -258,7 +401,7 @@ class _CartScreenState extends State<CartScreen> {
                                         textAlignVertical:
                                             TextAlignVertical.center,
                                         controller: input,
-                                        decoration: const InputDecoration(
+                                        decoration: InputDecoration(
                                           border: InputBorder.none,
                                         ),
                                       ),
@@ -267,12 +410,20 @@ class _CartScreenState extends State<CartScreen> {
                                 ),
                                 InkWell(
                                   onTap: () {
-                                    counter.increment();
+                                    if (isSelect == true) {
+                                      print('sebelum di kurang ${total}');
+                                      total = total! + harga;
+                                      print('setelh di kurang ${total}');
+                                      context
+                                          .read<TotalProductCubit>()
+                                          .checked(total);
+                                    }
+                                    counter.increment(id_keranjang: id);
                                   },
                                   child: Icon(
                                     Icons.add,
                                     size: 20,
-                                    color: primaryColor,
+                                    color: secondaryColor,
                                   ),
                                 ),
                               ],
@@ -291,8 +442,9 @@ class _CartScreenState extends State<CartScreen> {
     }
 
     Widget bottom() {
+      TotalProductCubit totalProduk = TotalProductCubit();
       return Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
             BoxShadow(
@@ -314,11 +466,27 @@ class _CartScreenState extends State<CartScreen> {
                     'Total Harga',
                     style: secondaryTextstyle.copyWith(fontSize: 17),
                   ),
-                  Text(
-                    'Rp. 4.024',
-                    style: secondaryTextstyle.copyWith(
-                        fontSize: 17, fontWeight: semibold),
+                  BlocBuilder<TotalProductCubit, int>(
+                    bloc: context.read<TotalProductCubit>(),
+                    builder: (context, state) {
+                      // TODO: implement listener
+                      return Text(
+                        "Rp. ${state == 0 ? '-' : numberFormat.format(state)}",
+                        style: secondaryTextstyle.copyWith(
+                            fontSize: 17, fontWeight: semibold),
+                      );
+                    },
+                    // child: Text(
+                    //           'Rp. -',
+                    //           style: secondaryTextstyle.copyWith(
+                    //               fontSize: 17, fontWeight: semibold),
+                    //         ),
                   )
+                  // Text(
+                  //             'Rp. -',
+                  //             style: secondaryTextstyle.copyWith(
+                  //                 fontSize: 17, fontWeight: semibold),
+                  //           ),
                 ],
               ),
             ),
@@ -334,25 +502,82 @@ class _CartScreenState extends State<CartScreen> {
       );
     }
 
-    return Scaffold(
-        backgroundColor: whiteColor,
-        appBar: PreferredSize(
-          child: appbar(),
-          preferredSize: Size.fromHeight(96),
-        ),
-        body: ListView(
-          children: [
-            alamat(),
-            produk(),
-            produk(),
-            produk(),
-            produk(),
-            produk(),
-            SizedBox(
-              height: 80,
+    if (email == null) {
+      return Scaffold(
+        backgroundColor: Colors.white38,
+        body: AlertDialog(
+          title: Text("Gagal"),
+          content: Text("Maaf Anda Belum Login"),
+          actions: [
+            TextButton(
+              child: Text(
+                'Login',
+                style: primaryTextstyle,
+              ),
+              onPressed: () =>
+                  Navigator.pushReplacementNamed(context, '/login'),
+            ),
+            GestureDetector(
+              onTap: () => Navigator.of(context).pop(),
+              child: Container(
+                margin: EdgeInsets.only(right: 15),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: primaryColor),
+                child: Text(
+                  'Ok',
+                  style: whiteTextstyle,
+                ),
+              ),
             )
+            // TextButton(
+            //   child: Text('Ok',style: primaryTextstyle,),
+            //   onPressed: () => Navigator.of(context).pop(),
+            // ),
           ],
         ),
-        bottomSheet: bottom());
+      );
+    } else {
+      return BlocBuilder<KeranjangCubitCubit, KeranjangCubitState>(
+        builder: (context, state) {
+          if (state is GetKeranjangCubitSuccess) {
+            return Scaffold(
+                backgroundColor: whiteColor,
+                appBar: PreferredSize(
+                  child: appbar(),
+                  preferredSize: Size.fromHeight(96),
+                ),
+                body: ListView(
+                  children: [
+                    alamat(),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemBuilder: (BuildContext context, int index) {
+                        return produk(
+                            state.keranjang[index].id,
+                            state.keranjang[index].nama,
+                            state.keranjang[index].gambar,
+                            state.keranjang[index].jumlah,
+                            state.keranjang[index].harga);
+                      },
+                      itemCount: state.keranjang.length,
+                    ),
+                    SizedBox(
+                      height: 80,
+                    )
+                  ],
+                ),
+                bottomSheet: bottom());
+          }
+          return Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(color: primaryColor),
+            ),
+          );
+        },
+      );
+    }
   }
 }

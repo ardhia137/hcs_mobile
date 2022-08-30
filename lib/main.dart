@@ -20,6 +20,7 @@ import 'package:hcs_mobile/cubit/covid_cubit_cubit.dart';
 import 'package:hcs_mobile/cubit/keranjang_cubit_cubit.dart';
 import 'package:hcs_mobile/cubit/produk_cubit_cubit.dart';
 import 'package:hcs_mobile/cubit/register_cubit_cubit.dart';
+import 'package:hcs_mobile/cubit/select_produk_cubit_cubit.dart';
 
  class MyHttpOverrides extends HttpOverrides{
   @override
@@ -35,7 +36,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+   const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +68,9 @@ class MyApp extends StatelessWidget {
         ),BlocProvider(
           create: (context) => KeranjangCubitCubit(),
           
+        ),BlocProvider(
+          create: (context) => TotalProductCubit(),
+          
         ),
       ],
       child: MaterialApp(
@@ -80,8 +84,8 @@ class MyApp extends StatelessWidget {
         routes: {
           // '/': (context) => LoginScreen(),
           '/': (context) => MainScreen(),
-          '/verification': (context) => const VerificationScreen(),
-          '/cart': (context) => const CartScreen(),
+          '/verification': (context) => VerificationScreen(),
+          '/cart': (context) => CartScreen(),
           '/register': (context) => RegisterScreen(),
           '/login': (context) => LoginScreen()
           },

@@ -60,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
     return false;
   }
-final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+ GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     final double shortestside = MediaQuery.of(context).size.shortestSide;
