@@ -619,8 +619,7 @@ class _DetailProdukScreenState extends State<DetailProdukScreen> {
           // print(state);
           return WillPopScope(
             onWillPop: () {
-              context.read<ProdukCubitCubit>().get_produk(11);
-              Navigator.pop(context, false);
+              Navigator.pushReplacementNamed(context, '/');
               return Future.value(false);
             },
             child: Scaffold(
@@ -631,38 +630,42 @@ class _DetailProdukScreenState extends State<DetailProdukScreen> {
                 title: Row(
                   children: [
                     InkWell(
-                      onTap: () => Navigator.pop(context, {
-                        context.read<ProdukCubitCubit>().get_produk(11),
-                      }),
+                      onTap:()=> Navigator.pushReplacementNamed(context, '/'),
+                      // onTap: () => Navigator.pop(context, {
+                      //   // context.read<ProdukCubitCubit>().get_produk(11),
+                      // }),
                       child: Icon(
                         Icons.arrow_back_ios,
                         color: secondaryColor,
                       ),
                     ),
                     Expanded(
-                      child: Container(
-                        margin: EdgeInsets.only(left: 5),
-                        height: 35,
-                        decoration: BoxDecoration(
-                            color: whiteColor,
-                            border: Border.all(color: secondaryColor2),
-                            borderRadius: BorderRadius.circular(7)),
+                      child: InkWell(
+                        onTap: ()=>Navigator.pushNamed(context, '/search'),
                         child: Container(
-                          margin: EdgeInsets.only(left: 10),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.search,
-                                color: secondaryColor2,
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Text(
-                                'Cari',
-                                style: secondaryTextstyle,
-                              )
-                            ],
+                          margin: EdgeInsets.only(left: 5),
+                          height: 35,
+                          decoration: BoxDecoration(
+                              color: whiteColor,
+                              border: Border.all(color: secondaryColor2),
+                              borderRadius: BorderRadius.circular(7)),
+                          child: Container(
+                            margin: EdgeInsets.only(left: 10),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.search,
+                                  color: secondaryColor2,
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  'Cari',
+                                  style: secondaryTextstyle,
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ),

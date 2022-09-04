@@ -46,6 +46,27 @@ class ProdukServices {
     } else {
       throw Exception('Gagal memuat produk');
     }
+  } 
+ Future<List<ProdukModel>> get_produk_search(String search) async {
+    var url = '${baseurl()}/api/produk/search/${search}';
+    var headers = {'Content-Type': 'application/json; charset=utf-8'};
+    var response = await http.get(
+      Uri.parse(url),
+      headers: headers,
+    );
+    print(url);
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      List data = jsonDecode(response.body)['data'];
+      List<ProdukModel> products = [];
+      for (var item in data) {
+        products.add(ProdukModel.fromJson(item));
+      }
+      print(products.length);
+      return products;
+    } else {
+      throw Exception('Gagal memuat produk');
+    }
   }
 
   

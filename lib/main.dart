@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hcs_mobile/Screen/CartScreen.dart';
 import 'package:hcs_mobile/Screen/CompleteRegisterScreen.dart';
 import 'package:hcs_mobile/Screen/DetailProdukScreen.dart';
+import 'package:hcs_mobile/Screen/SearchScreen.dart';
 import 'package:hcs_mobile/Screen/home/HomeScreen.dart';
 import 'package:hcs_mobile/Screen/LoginScreen.dart';
 import 'package:hcs_mobile/Screen/RegisterScreen.dart';
@@ -17,9 +18,11 @@ import 'package:hcs_mobile/Screen/home/MainScreen.dart';
 import 'package:hcs_mobile/cubit/auth_cubit_cubit.dart';
 import 'package:hcs_mobile/cubit/change_page_cubit_cubit.dart';
 import 'package:hcs_mobile/cubit/covid_cubit_cubit.dart';
+import 'package:hcs_mobile/cubit/kategori_cubit_cubit.dart';
 import 'package:hcs_mobile/cubit/keranjang_cubit_cubit.dart';
 import 'package:hcs_mobile/cubit/produk_cubit_cubit.dart';
 import 'package:hcs_mobile/cubit/register_cubit_cubit.dart';
+import 'package:hcs_mobile/cubit/search_cubit_cubit.dart';
 import 'package:hcs_mobile/cubit/select_produk_cubit_cubit.dart';
 
  class MyHttpOverrides extends HttpOverrides{
@@ -71,6 +74,12 @@ class MyApp extends StatelessWidget {
         ),BlocProvider(
           create: (context) => TotalProductCubit(),
           
+        ),BlocProvider(
+          create: (context) => SearchCubitCubit(),
+          
+        ),BlocProvider(
+          create: (context) => KategoriCubitCubit(),
+          
         ),
       ],
       child: MaterialApp(
@@ -87,7 +96,8 @@ class MyApp extends StatelessWidget {
           '/verification': (context) => VerificationScreen(),
           '/cart': (context) => CartScreen(),
           '/register': (context) => RegisterScreen(),
-          '/login': (context) => LoginScreen()
+          '/login': (context) => LoginScreen(),
+          '/search': (context) => SearchScreen()
           },
       ),
     );

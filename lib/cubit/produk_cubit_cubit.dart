@@ -29,4 +29,13 @@ class ProdukCubitCubit extends Cubit<ProdukCubitState> {
       emit(ProdukCubitGagal(e.toString()));
     }
   }
+  void get_produk_search(String search)async{
+    try {
+      emit(ProdukCubitLoading());
+      List<ProdukModel> produk = await ProdukServices().get_produk_search(search);
+      emit(ProdukCubitSuccess(produk));
+    } catch (e) {
+      emit(ProdukCubitGagal(e.toString()));
+    }
+  }
 }

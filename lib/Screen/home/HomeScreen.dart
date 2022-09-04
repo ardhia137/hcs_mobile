@@ -44,7 +44,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     _transTween = Tween(begin: Offset(-10, 40), end: Offset(-10, 0))
         .animate(_TextAnimationController);
+
+     
     super.initState();
+ context.read<CovidCubitCubit>().get_covid();
+    context.read<ProdukCubitCubit>().get_produk(11);
     // print('objectdassds');
   }
 
@@ -65,8 +69,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final double shortestside = MediaQuery.of(context).size.shortestSide;
     final bool phonelayout = shortestside < 600;
-    context.read<CovidCubitCubit>().get_covid();
-    context.read<ProdukCubitCubit>().get_produk(11);
+   
     final numberFormat = new NumberFormat("#,##0", "en_US");
     Widget headeriklan() {
       return Stack(
@@ -147,22 +150,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   color: whiteColor,
                   border: Border.all(color: secondaryColor2),
                   borderRadius: BorderRadius.circular(7)),
-              child: Container(
-                margin: EdgeInsets.only(left: 10),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.search,
-                      color: secondaryColor2,
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      'Cari',
-                      style: secondaryTextstyle,
-                    )
-                  ],
+              child: InkWell(
+                onTap: () => Navigator.pushNamed(context, '/search'),
+                child: Container(
+                  margin: EdgeInsets.only(left: 10),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.search,
+                        color: secondaryColor2,
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        'Cari',
+                        style: secondaryTextstyle,
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -395,7 +401,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ))));
               },
               child:Padding(
-                padding: const EdgeInsets.only(bottom: 10),
+                padding: EdgeInsets.all(2),
                 child: ProdukWidget(img: produk[index].gambar,nama: produk[index].nama,harga: produk[index].harga,),
               )
             );
@@ -413,7 +419,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           child: BlocBuilder<CovidCubitCubit, CovidCubitState>(         
             builder: (context, covidstate) {
               return BlocBuilder<ProdukCubitCubit, ProdukCubitState>(
-                bloc: BlocProvider.of<ProdukCubitCubit>(context)..get_produk(11),
+                // bloc: BlocProvider.of<ProdukCubitCubit>(context)..get_produk(11),
                 builder: (context, produkstate) {
                   if (covidstate is CovidCubitSuccess &&
                       produkstate is ProdukCubitSuccess) {
